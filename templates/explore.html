@@ -32,7 +32,7 @@
                         <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('data') }}">Data</a>
+                        <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('news') }}">News</a>
@@ -62,6 +62,45 @@
             </div>
         </div>
     </div>
+
+    <div class="container mt-5 pt-5">
+        <div class="form-container">
+            <form id="raceForm" class="row">
+                <div class="col">
+                    <label for="year" class="form-label">Year:</label>
+                    <select id="year" name="year" class="form-select" required>
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="event" class="form-label">Event:</label>
+                    <select id="event" name="event" class="form-select" required>
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="drivers" class="form-label">Drivers:</label>
+                    <select id="drivers" name="drivers" class="form-select" required>
+                        <!-- Options will be dynamically added here -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Unwrap!</button>
+            </form>
+        </div>
+        
+        <div class="form-container">
+            <div id="raceData">
+                <img id="raceGraph" src="" alt="Race Graph" style="max-width:100%; display:none;">
+                <p id="fastestLap" style="display:none;"></p>
+            </div>
+        </div>
+
+        <!-- Loading logo -->
+        <div id="loading" style="display:none;">
+            <img src="{{ url_for('static', filename='images/speedfest-automovilismo.gif') }}" alt="Loading..." class="mx-auto d-block">
+        </div>
+    </div>
+    
 
     <!-- Toast Notification -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer">

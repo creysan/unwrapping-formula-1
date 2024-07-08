@@ -4,8 +4,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, classification_report
-from flask import jsonify
-import joblib  # Import for saving/loading models
+import joblib 
 
 # Load data globally or in a main function
 df = pd.read_csv('racing-data.csv')
@@ -174,7 +173,7 @@ if __name__ == '__main__':
     model = train_model(X_train, y_train)
     accuracy, report = evaluate_model(model, X_test, y_test)
     
-    print(f"Model Accuracy: {accuracy:.3f}")
+    print(f"Model Accuracy: {accuracy:.3f}") #0.946
     print("Classification Report:")
     print(report)
 

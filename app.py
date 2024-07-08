@@ -86,9 +86,9 @@ def calendar():
                            upcoming_races=upcoming_races)
 
 # Route for the data page
-@app.route('/data')
-def data():
-    return render_template('data.html')
+@app.route('/explore')
+def explore():
+    return render_template('explore.html')
 
 # Route for the news page
 @app.route('/news')
@@ -280,8 +280,6 @@ def predict_winner():
         return jsonify({'predicted_winners': prediction_result})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5000)
