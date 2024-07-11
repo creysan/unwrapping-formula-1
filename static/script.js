@@ -103,39 +103,40 @@ function populateEvents(year) {
 }
 
 // Function to populate drivers dropdown based on selected event
-// function populateDrivers(year, round) {
-//     // Show the loading GIF
-//     document.getElementById('loading').style.display = 'flex';
+function populateDrivers(year, round) {
+    // Show the loading GIF
+    document.getElementById('loading').style.display = 'flex';
 
-//     fetch(`/get_drivers?year=${year}&round=${round}`)
-//         .then(response => response.json())
-//         .then(drivers => {
-//             const driversDropdown = document.getElementById('drivers');
-//             driversDropdown.innerHTML = '';  // Clear existing options
+    fetch(`/get_drivers?year=${year}&round=${round}`)
+        .then(response => response.json())
+        .then(drivers => {
+            console.log(drivers)
+            const driversDropdown = document.getElementById('drivers');
+            driversDropdown.innerHTML = '';  // Clear existing options
 
-//             drivers.forEach(driver => {
-//                 const option = document.createElement('option');
-//                 option.value = driver.driverId;
-//                 option.text = driver.driverName;
-//                 option.abbrev = driver.driverAbbreviation;
-//                 driversDropdown.add(option);
-//             });
-//         })
-//         .catch(error => {
-//             console.error('Error fetching drivers:', error);
-//         })
-//         .finally(() => {
-//             // Hide the loading GIF
-//             document.getElementById('loading').style.display = 'none';
-//         });
-// }
+            drivers.forEach(driver => {
+                const option = document.createElement('option');
+                option.value = driver.driverId;
+                option.text = driver.driverName;
+                option.abbrev = driver.driverAbbreviation;
+                driversDropdown.add(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching drivers:', error);
+        })
+        .finally(() => {
+            // Hide the loading GIF
+            document.getElementById('loading').style.display = 'none';
+        });
+}
 
 
 // Fetch and populate the list of years when the page loads
 document.addEventListener('DOMContentLoaded', populateYears);
 
 // Update events dropdown when the year changes
-// document.getElementById('year').addEventListener('change', function(event) {
+// document.getElementById('year').addEventListener('change', function(event) { 
 //     const year = event.target.value;
 //     populateEvents(year);
 // });
@@ -149,13 +150,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 // Update drivers dropdown when the event changes
 // document.getElementById('event').addEventListener('change', function(event) {
 //     const year = document.getElementById('year').value;
 //     const round = event.target.value;
+//     console.log(year)
+//     console.log(round)
 //     populateDrivers(year, round);
 // });
+document.addEventListener('DOMContentLoaded', () => {
+    const yearDropdown = document.getElementById('year');
+    const eventDropdown = document.getElementById('event');
+
+    // Ensure both dropdowns exist before attaching event listeners
+    if (yearDropdown && eventDropdown) {
+        // Event listener for year dropdown
+        yearDropdown.addEventListener('change', function(event) {
+            const year = event.target.value;
+            const round = eventDropdown.value; // Get current selected event
+            populateDrivers(year, round);
+        });
+
+        // Event listener for event dropdown
+        eventDropdown.addEventListener('change', function(event) {
+            const year = yearDropdown.value; // Get current selected year
+            const round = event.target.value;
+            populateDrivers(year, round);
+        });
+    }
+});
+
 
 // document.getElementById('raceForm').addEventListener('submit', function(event) {
 //     event.preventDefault();
@@ -192,6 +216,49 @@ document.addEventListener('DOMContentLoaded', () => {
 //         console.error('Error fetching race data:', error);
 //     });
 // });
+
+
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const raceForm = document.getElementById('raceForm');
+//     if (raceForm) {
+//         raceForm.addEventListener('submit', function(event) {
+//             event.preventDefault();
+
+//             const year = document.getElementById('year').value;
+//             const round = document.getElementById('event').value;
+//             const selectedDrivers = [...document.getElementById('drivers').selectedOptions].map(option => option.abbrev);
+//             const isDarkMode = localStorage.getItem('darkMode') === 'true';
+//             const loadingElement = document.getElementById('loading');
+
+//             // Show the loading logo
+//             loadingElement.style.display = 'flex';
+
+//             // Assuming selectedDrivers is an array of driver abbreviations
+//             const driverAbbrv = selectedDrivers[0];  // Assuming you are selecting only one driver
+
+//             fetch(`/get_race_data?year=${year}&round=${round}&drivers=${encodeURIComponent(driverAbbrv)}`)
+//             .then(response => response.json())
+//             .then(data => {
+//                 // Hide the loading logo
+//                 loadingElement.style.display = 'none';
+
+//                 const imgElement = document.getElementById('raceGraph');
+//                 imgElement.src = 'data:image/png;base64,' + data.img_base64;
+//                 imgElement.style.display = 'block';
+
+//                 const fastestLapElement = document.getElementById('fastestLap');
+//                 // Handle exceptional_laps data if needed
+//                 fastestLapElement.style.display = 'block';
+//             })
+//             .catch(error => {
+//                 // Hide the loading logo even if there is an error
+//                 loadingElement.style.display = 'none';
+//                 console.error('Error fetching race data:', error);
+//             });
+//         });
+//     }
+// });
 document.addEventListener('DOMContentLoaded', () => {
     const raceForm = document.getElementById('raceForm');
     if (raceForm) {
@@ -216,9 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Hide the loading logo
                 loadingElement.style.display = 'none';
 
+                // Plotly plot
+                const plotlyDiv = document.getElementById('plotly-div');
+                plotlyDiv.style.display = 'block';
+                const plotlyData = JSON.parse(data.plotly_json);
+                Plotly.newPlot('plotly-div', plotlyData.data, plotlyData.layout);
+
+                // Hide the static image plot (if any)
                 const imgElement = document.getElementById('raceGraph');
-                imgElement.src = 'data:image/png;base64,' + data.img_base64;
-                imgElement.style.display = 'block';
+                imgElement.style.display = 'none';
 
                 const fastestLapElement = document.getElementById('fastestLap');
                 // Handle exceptional_laps data if needed
@@ -232,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
 
 // Function to convert seconds to 'MM:SS' format

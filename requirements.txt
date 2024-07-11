@@ -1,0 +1,9 @@
+fastf1
+Flask
+matplotlib
+numpy
+plotly
+pandas
+Flask-Mail
+python-dotenv
+Flask-Cors

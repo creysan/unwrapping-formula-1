@@ -8,7 +8,6 @@ import base64
 import requests
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
-from flask_cors import CORS
 from logging import FileHandler, WARNING
 from flask_mail import Mail, Message
 from datetime import datetime
@@ -155,6 +154,67 @@ def get_drivers():
         print(error_msg)
         return jsonify({'error': error_msg}), 500  # Return error message with status code 500
 
+# @app.route('/get_race_data', methods=['GET'])
+# def get_race_data():
+#     year = request.args.get('year', default=2023, type=int)
+#     race_round = request.args.get('round', default=1, type=int)
+#     driver_id = request.args.get('drivers')  # Get selected driver ID
+
+#     session = fastf1.get_session(year, race_round, 'R')  # 'R' for Race
+#     session.load()
+
+#     # Convert Race Round to Event Name
+#     event_names = fastf1.get_event_schedule(year)
+#     round_name = event_names.loc[event_names['RoundNumber'] == race_round, 'EventName'].values[0]
+
+#     # Convert driver_id to full name
+#     session_results = session.results
+#     fullDriverName = next(driver['FullName'] for _, driver in session_results.iterrows() if driver['Abbreviation'] == driver_id)
+
+#     # Filter session results for the selected driver
+#     laps_data = session.laps.pick_drivers(driver_id)
+
+#     if len(laps_data) == 0:
+#         return jsonify({'error': f'No data found for driver {driver_id} in {year} round {race_round}'}), 404
+
+#     # Retrieve lap numbers and lap times
+#     lap_numbers = laps_data['LapNumber']
+#     lap_times = laps_data['LapTime']
+#     lap_times_seconds = lap_times.dt.total_seconds()  # Convert lap times to seconds for plotting
+
+#     # Plotting lap times for the selected driver
+#     plt.figure(figsize=(10, 6))
+#     plt.plot(lap_numbers, lap_times_seconds, label=f'Driver {driver_id}', color='red')
+
+#     plt.xlabel('Lap Number')
+#     plt.ylabel('Lap Time (seconds)')
+#     plt.title(f'Lap Times for {fullDriverName} in {year}\'s {round_name}')
+#     plt.legend()
+#     plt.grid(True)
+
+#     # Save plot to a BytesIO object
+#     img_buf = BytesIO()
+#     plt.savefig(img_buf, format='png')
+#     img_buf.seek(0)
+
+#     # Convert image to base64
+#     img_base64 = base64.b64encode(img_buf.getvalue()).decode('utf-8')
+
+#     # Clean up plot resources
+#     plt.close()
+
+#     # Prepare response data
+#     response_data = {
+#         'img_base64': img_base64,
+#         'exceptional_laps': {},  # Placeholder for additional data if needed
+#     }
+
+#     return jsonify(response_data)
+# test_plotly.py
+import pandas as pd
+import plotly.express as px
+print("Plotly imported successfully")
+
 @app.route('/get_race_data', methods=['GET'])
 def get_race_data():
     year = request.args.get('year', default=2023, type=int)
@@ -183,30 +243,22 @@ def get_race_data():
     lap_times = laps_data['LapTime']
     lap_times_seconds = lap_times.dt.total_seconds()  # Convert lap times to seconds for plotting
 
-    # Plotting lap times for the selected driver
-    plt.figure(figsize=(10, 6))
-    plt.plot(lap_numbers, lap_times_seconds, label=f'Driver {driver_id}', color='red')
+    # Create a DataFrame for Plotly
+    df = pd.DataFrame({
+        'Lap Number': lap_numbers,
+        'Lap Time (seconds)': lap_times_seconds
+    })
 
-    plt.xlabel('Lap Number')
-    plt.ylabel('Lap Time (seconds)')
-    plt.title(f'Lap Times for {fullDriverName} in {year}\'s {round_name}')
-    plt.legend()
-    plt.grid(True)
+    # Create an interactive plot using Plotly
+    fig = px.line(df, x='Lap Number', y='Lap Time (seconds)', title=f'Lap Times for {fullDriverName} in {year}\'s {round_name}')
+    fig.update_traces(mode='lines+markers', hovertemplate='Lap: %{x}<br>Time: %{y:.2f} seconds')
 
-    # Save plot to a BytesIO object
-    img_buf = BytesIO()
-    plt.savefig(img_buf, format='png')
-    img_buf.seek(0)
-
-    # Convert image to base64
-    img_base64 = base64.b64encode(img_buf.getvalue()).decode('utf-8')
-
-    # Clean up plot resources
-    plt.close()
+    # Convert plot to JSON for rendering in the front-end
+    graphJSON = fig.to_json()
 
     # Prepare response data
     response_data = {
-        'img_base64': img_base64,
+        'plotly_json': graphJSON,
         'exceptional_laps': {},  # Placeholder for additional data if needed
     }
 
