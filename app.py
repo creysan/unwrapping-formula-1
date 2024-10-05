@@ -1,27 +1,19 @@
 from flask import Flask, request, jsonify, render_template
-import fastf1
-import os
-import matplotlib.pyplot as plt
-import numpy as np
-from io import BytesIO
-import base64
-import requests
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
-from logging import FileHandler, WARNING
-from flask_mail import Mail, Message
 from datetime import datetime
+import fastf1
+import os
+import pandas as pd
+import plotly.express as px
+from model import predict_race_winner, load_model
 
-# Load environment variables from .env file
 load_dotenv()
-
-# Set the Matplotlib backend to 'Agg' to avoid issues with GUI backends
-plt.switch_backend('Agg')
 
 app = Flask(__name__)
 
+# Contact Form Email
 app.config.update(
-    #EMAIL SETTINGS
     DEBUG=True,
     MAIL_SERVER = os.getenv('MAIL_SERVER'), 
     MAIL_PORT = os.getenv('MAIL_PORT'),
@@ -32,7 +24,6 @@ app.config.update(
 
 mail = Mail(app)
 
-
 # Path to cache directory
 CACHE_DIR = 'cache'
 
@@ -42,12 +33,12 @@ if not os.path.exists(CACHE_DIR):
 
 fastf1.Cache.enable_cache(CACHE_DIR)  # Enable caching
 
-### <----- Render Webpages -----> ###
+# Route for the Home Page
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Route for the calendar page
+# Route for the Calendar Page
 @app.route('/calendar')
 def calendar():
     # Get the current year
@@ -85,9 +76,9 @@ def calendar():
                            upcoming_races=upcoming_races)
 
 # Route for the data page
-@app.route('/explore')
-def explore():
-    return render_template('explore.html')
+@app.route('/unwrap')
+def unwrap():
+    return render_template('unwrap.html')
 
 # Route for the news page
 @app.route('/news')
@@ -108,7 +99,7 @@ def contact():
 @app.route('/get_years', methods=['GET'])
 def get_years():
     # List of available years for F1 seasons in descending order
-    available_years = list(range(2024, 1949, -1))  # From 2023 to 1950
+    available_years = list(range(2024, 1949, -1))
     return jsonify(available_years)
 
 @app.route('/get_events', methods=['GET'])
@@ -153,67 +144,6 @@ def get_drivers():
         error_msg = f"Error fetching drivers for {year} round {race_round}: {str(e)}"
         print(error_msg)
         return jsonify({'error': error_msg}), 500  # Return error message with status code 500
-
-# @app.route('/get_race_data', methods=['GET'])
-# def get_race_data():
-#     year = request.args.get('year', default=2023, type=int)
-#     race_round = request.args.get('round', default=1, type=int)
-#     driver_id = request.args.get('drivers')  # Get selected driver ID
-
-#     session = fastf1.get_session(year, race_round, 'R')  # 'R' for Race
-#     session.load()
-
-#     # Convert Race Round to Event Name
-#     event_names = fastf1.get_event_schedule(year)
-#     round_name = event_names.loc[event_names['RoundNumber'] == race_round, 'EventName'].values[0]
-
-#     # Convert driver_id to full name
-#     session_results = session.results
-#     fullDriverName = next(driver['FullName'] for _, driver in session_results.iterrows() if driver['Abbreviation'] == driver_id)
-
-#     # Filter session results for the selected driver
-#     laps_data = session.laps.pick_drivers(driver_id)
-
-#     if len(laps_data) == 0:
-#         return jsonify({'error': f'No data found for driver {driver_id} in {year} round {race_round}'}), 404
-
-#     # Retrieve lap numbers and lap times
-#     lap_numbers = laps_data['LapNumber']
-#     lap_times = laps_data['LapTime']
-#     lap_times_seconds = lap_times.dt.total_seconds()  # Convert lap times to seconds for plotting
-
-#     # Plotting lap times for the selected driver
-#     plt.figure(figsize=(10, 6))
-#     plt.plot(lap_numbers, lap_times_seconds, label=f'Driver {driver_id}', color='red')
-
-#     plt.xlabel('Lap Number')
-#     plt.ylabel('Lap Time (seconds)')
-#     plt.title(f'Lap Times for {fullDriverName} in {year}\'s {round_name}')
-#     plt.legend()
-#     plt.grid(True)
-
-#     # Save plot to a BytesIO object
-#     img_buf = BytesIO()
-#     plt.savefig(img_buf, format='png')
-#     img_buf.seek(0)
-
-#     # Convert image to base64
-#     img_base64 = base64.b64encode(img_buf.getvalue()).decode('utf-8')
-
-#     # Clean up plot resources
-#     plt.close()
-
-#     # Prepare response data
-#     response_data = {
-#         'img_base64': img_base64,
-#         'exceptional_laps': {},  # Placeholder for additional data if needed
-#     }
-
-#     return jsonify(response_data)
-# test_plotly.py
-import pandas as pd
-import plotly.express as px
-print("Plotly imported successfully")
 
 @app.route('/get_race_data', methods=['GET'])
 def get_race_data():
@@ -297,38 +227,38 @@ def send_message():
     return jsonify({'success': True, 'message': 'Message sent successfully!'})
 
 
-from flask import Flask, request, jsonify
-from model import predict_race_winner, load_model
-
 @app.route('/predict_winner', methods=['POST'])
 def predict_winner():
     data = request.json
-    year = int(data['year'])
-    event_round = int(data['event']) # Assuming frontend sends round number
-    print("YEAR AND EVENT: ", year, event_round)
+    year = data.get('year')
+    event_round = data.get('event')
     
+    if not year or not event_round:
+        return jsonify({'error': "Year and event round are required"}), 400
+    
+    try:
+        year = int(year)
+        event_round = int(event_round)
+    except ValueError:
+        return jsonify({'error': "Year and event round must be valid integers"}), 400
+
     try:
         # Find the event name corresponding to the given round number
         event_names = fastf1.get_event_schedule(year)
-        print("Event Names: \n", event_names)  # Print event_names for debugging
-        print(event_round)
-        print(type(event_round))
-        print(type(event_names["RoundNumber"]))
+
         if event_round not in event_names['RoundNumber'].values:
             return jsonify({'error': f"Event round {event_round} not found for year {year}"}), 404
-        print("PREVIEW")
         round_name = event_names.loc[event_names['RoundNumber'] == event_round, 'Country'].values[0]
-        print("Round Name:", round_name)  # Print round_name for debugging
 
         # Load the pre-trained model
         loaded_model = load_model('pretrained_race_winner_model.pkl')
 
         # Define the features needed for prediction
         features = ['GridPosition', 'AvgQualifyingTime', 'Position']
-        print(features)
+
         # Call predict_race_winner with the loaded model and features
         prediction_result = predict_race_winner(year, round_name, loaded_model, features)
-        print(prediction_result)
+
         return jsonify({'predicted_winners': prediction_result})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

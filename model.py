@@ -141,13 +141,22 @@ def predict_race_winner(year, race_name, model, features):
 
     # Make predictions
     win_probabilities = model.predict_proba(X_target_race)[:, 1]
-    prepared_target_data['WinProbability'] = win_probabilities
+    
+    # Normalize probabilities
+    normalized_probabilities = win_probabilities / np.sum(win_probabilities)
+    
+    prepared_target_data['WinProbability'] = normalized_probabilities
 
     # Sort by 'WinProbability' in descending order and get the top 5
     top_5_drivers = prepared_target_data.nlargest(5, 'WinProbability')
 
-    # Convert the top 5 drivers' names to a list
-    predicted_winners = top_5_drivers['FullName'].tolist()
+    # Convert the top 5 drivers' names and probabilities to a list of dictionaries
+    predicted_winners = [
+        {"driver": driver, "probability": prob} 
+        for driver, prob in zip(top_5_drivers['FullName'], top_5_drivers['WinProbability'])
+    ]
+
+    print(top_5_drivers['WinProbability'])
 
     return predicted_winners
 
