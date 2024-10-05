@@ -1,81 +1,92 @@
-### README
+# Unwrapping Formula 1
 
-# Formula 1 Race Data Visualizer
+## Project Overview
 
-## Description
-
-The Formula 1 Race Data Visualizer is a web application that allows users to explore and visualize race data from past Formula 1 races. Leveraging the FastF1 library, this application provides insights into average lap times and the fastest laps for selected races. Users can choose a race year and round, and the application will generate a plot displaying the average lap times per lap. Additionally, it highlights the driver with the fastest lap and their lap time.
+Unwrapping Formula 1 is a web application that provides Formula 1 race predictions and insights using machine learning. The application features a race calendar, detailed race analysis, and a prediction model for upcoming races.
 
 ## Features
 
-- Select a specific Formula 1 race by year and round.
-- Visualize the average lap times per lap in a race.
-- Identify and display the driver with the fastest lap and their lap time.
-- Easy-to-use web interface.
+- Interactive race calendar
+- Race winner prediction model
+- Detailed race analysis with lap time visualizations
+- Dark mode support
+- Responsive design for various devices
 
-## Installation
+## Technology Stack
+
+- Frontend: HTML, CSS, JavaScript
+- Backend: Python, Flask
+- Machine Learning: XGBoost (Gradient Boosting Classifier)
+- Data Visualization: Plotly
+- Additional Libraries: pandas, numpy, scikit-learn
+
+## Machine Learning Model
+
+Our Formula 1 race winner prediction model uses a Gradient Boosting Classifier (XGBoost) trained on historical F1 data from 2014 to 2023. 
+
+Key aspects of the model:
+- Data sources: race results, qualifying results, driver standings, and constructor standings
+- Feature engineering: includes recent form, qualifying position, historical track performance, and current season performance
+- Preprocessing: handling missing values, encoding categorical variables, and normalizing numerical features
+- Model training: 80% training data, 20% test data, with 5-fold cross-validation
+- Hyperparameter tuning: performed using grid search
+
+Model performance:
+- Accuracy on test set: 92%
+- Key metrics: F1-score, ROC-AUC
+
+## Setup and Installation
 
 1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/your-username/f1-race-data-visualizer.git
-   cd f1-race-data-visualizer
+   ```
+   git clone https://github.com/yourusername/unwrapping-formula-1.git
+   cd unwrapping-formula-1
    ```
 
-2. Create a virtual environment and activate it:
-
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate   # On Windows use `venv\Scripts\activate`
+2. Create a virtual environment:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
 
 3. Install the required packages:
-
-   ```bash
+   ```
    pip install -r requirements.txt
    ```
 
-4. Run the application:
+4. Set up environment variables:
+   Create a `.env` file in the root directory and add the following:
+   ```
+   MAIL_SERVER=your_mail_server
+   MAIL_PORT=your_mail_port
+   MAIL_USE_SSL=True
+   MAIL_USERNAME=your_email@example.com
+   MAIL_PASSWORD=your_email_password
+   ```
 
-   ```bash
+5. Run the Flask application:
+   ```
    python app.py
    ```
 
-5. Open your web browser and go to `http://127.0.0.1:5000/` to access the application.
+6. Open a web browser and navigate to `http://localhost:5000`
 
 ## Usage
 
-1. On the main page, select the year and round of the Formula 1 race you are interested in.
-2. Click the "Get Race Data" button to generate the visualization.
-3. View the plot of average lap times per lap and information about the fastest lap.
-
-## Dependencies
-
-- Flask
-- FastF1
-- Matplotlib
-- Pandas
-- Base64
-- OS
-- IO
-
-## Project Structure
-
-```
-f1-race-data-visualizer/
-│
-├── cache/                   # Directory for cached data
-├── templates/
-│   └── index.html           # HTML file for the web interface
-├── app.py                   # Main application file
-├── requirements.txt         # List of required Python packages
-└── README.md                # Project README file
-```
+- Navigate through the site using the menu bar
+- Use the calendar page to view upcoming and past races
+- On the prediction page, select a year and event to get race winner predictions
+- Toggle between light and dark mode using the switch in the navigation bar
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
+Contributions to Unwrapping Formula 1 are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Acknowledgments
+
+- Formula 1 for the inspiration and data
+- The FastF1 library for providing access to Formula 1 data
