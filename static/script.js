@@ -135,11 +135,6 @@ function populateDrivers(year, round) {
 // Fetch and populate the list of years when the page loads
 document.addEventListener('DOMContentLoaded', populateYears);
 
-// Update events dropdown when the year changes
-// document.getElementById('year').addEventListener('change', function(event) { 
-//     const year = event.target.value;
-//     populateEvents(year);
-// });
 document.addEventListener('DOMContentLoaded', () => {
     const yearDropdown = document.getElementById('year');
     if (yearDropdown) {  // Ensure the element exists
@@ -150,14 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Update drivers dropdown when the event changes
-// document.getElementById('event').addEventListener('change', function(event) {
-//     const year = document.getElementById('year').value;
-//     const round = event.target.value;
-//     console.log(year)
-//     console.log(round)
-//     populateDrivers(year, round);
-// });
 document.addEventListener('DOMContentLoaded', () => {
     const yearDropdown = document.getElementById('year');
     const eventDropdown = document.getElementById('event');
@@ -180,85 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
-// document.getElementById('raceForm').addEventListener('submit', function(event) {
-//     event.preventDefault();
-
-//     const year = document.getElementById('year').value;
-//     const round = document.getElementById('event').value;
-//     const selectedDrivers = [...document.getElementById('drivers').selectedOptions].map(option => option.abbrev);
-//     const isDarkMode = localStorage.getItem('darkMode') === 'true';
-//     const loadingElement = document.getElementById('loading');
-
-//     // Show the loading logo
-//     loadingElement.style.display = 'flex';
-
-//     // Assuming selectedDrivers is an array of driver abbreviations
-//     const driverAbbrv = selectedDrivers[0];  // Assuming you are selecting only one driver
-
-//     fetch(`/get_race_data?year=${year}&round=${round}&drivers=${encodeURIComponent(driverAbbrv)}`)
-//     .then(response => response.json())
-//     .then(data => {
-//         // Hide the loading logo
-//         loadingElement.style.display = 'none';
-
-//         const imgElement = document.getElementById('raceGraph');
-//         imgElement.src = 'data:image/png;base64,' + data.img_base64;
-//         imgElement.style.display = 'block';
-
-//         const fastestLapElement = document.getElementById('fastestLap');
-//         // Handle exceptional_laps data if needed
-//         fastestLapElement.style.display = 'block';
-//     })
-//     .catch(error => {
-//         // Hide the loading logo even if there is an error
-//         loadingElement.style.display = 'none';
-//         console.error('Error fetching race data:', error);
-//     });
-// });
-
-
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const raceForm = document.getElementById('raceForm');
-//     if (raceForm) {
-//         raceForm.addEventListener('submit', function(event) {
-//             event.preventDefault();
-
-//             const year = document.getElementById('year').value;
-//             const round = document.getElementById('event').value;
-//             const selectedDrivers = [...document.getElementById('drivers').selectedOptions].map(option => option.abbrev);
-//             const isDarkMode = localStorage.getItem('darkMode') === 'true';
-//             const loadingElement = document.getElementById('loading');
-
-//             // Show the loading logo
-//             loadingElement.style.display = 'flex';
-
-//             // Assuming selectedDrivers is an array of driver abbreviations
-//             const driverAbbrv = selectedDrivers[0];  // Assuming you are selecting only one driver
-
-//             fetch(`/get_race_data?year=${year}&round=${round}&drivers=${encodeURIComponent(driverAbbrv)}`)
-//             .then(response => response.json())
-//             .then(data => {
-//                 // Hide the loading logo
-//                 loadingElement.style.display = 'none';
-
-//                 const imgElement = document.getElementById('raceGraph');
-//                 imgElement.src = 'data:image/png;base64,' + data.img_base64;
-//                 imgElement.style.display = 'block';
-
-//                 const fastestLapElement = document.getElementById('fastestLap');
-//                 // Handle exceptional_laps data if needed
-//                 fastestLapElement.style.display = 'block';
-//             })
-//             .catch(error => {
-//                 // Hide the loading logo even if there is an error
-//                 loadingElement.style.display = 'none';
-//                 console.error('Error fetching race data:', error);
-//             });
-//         });
-//     }
-// });
 document.addEventListener('DOMContentLoaded', () => {
     const raceForm = document.getElementById('raceForm');
     if (raceForm) {
@@ -315,78 +223,67 @@ function seconds_to_minutes(seconds) {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-// document.getElementById('predictionForm').addEventListener('submit', function(event) {
-//     event.preventDefault();
-    
-//     const year = document.getElementById('year').value;
-//     const eventRound = document.getElementById('event').value;  // Ensure this is capturing the correct value
-//     console.log("Year:", year, "Event Round:", eventRound);
-    
-//     // Show the loading GIF
-//     document.getElementById('loading').style.display = 'block';
-
-//     fetch('/predict_winner', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({ year: year, event: eventRound })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         // Hide the loading GIF
-//         document.getElementById('loading').style.display = 'none';
-//         console.log("Predicted Winners Data:", data);
-        
-//         if (data.predicted_winners) {  // Note the use of 'predicted_winners'
-//             document.getElementById('predictionResult').innerHTML = `<h2>Predicted Winners: ${data.predicted_winners.join(', ')}</h2>`;
-//         } else {
-//             document.getElementById('predictionResult').innerHTML = `<h2>Error: ${data.error}</h2>`;
-//         }
-//     })
-//     .catch(error => {
-//         // Hide the loading GIF
-//         document.getElementById('loading').style.display = 'none';
-//         console.error('Error fetching prediction:', error);
-//     });
-// });
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     const predictionForm = document.getElementById('predictionForm');
-    if (predictionForm) {
-        predictionForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+    const yearSelect = document.getElementById('year');
+    const eventSelect = document.getElementById('event');
+    const predictionTable = document.getElementById('predictionTable');
+    const loadingIndicator = document.getElementById('loading');
+
+    predictionForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent form submission
+
+        // Show loading indicator
+        loadingIndicator.style.display = 'block';
+        
+        // Hide previous results
+        predictionTable.style.display = 'none';
+        
+        const year = yearSelect.value;
+        const event = eventSelect.value;
+        
+        if (!year || !event) {
+            alert('Please select both year and event.');
+            loadingIndicator.style.display = 'none';
+            return;
+        }
+
+        fetch('/predict_winner', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ year: year, event: event }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingIndicator.style.display = 'none';
             
-            const year = document.getElementById('year').value;
-            const eventRound = document.getElementById('event').value;  // Ensure this is capturing the correct value
-            console.log("Year:", year, "Event Round:", eventRound);
-            
-            // Show the loading GIF
-            document.getElementById('loading').style.display = 'flex';
-    
-            fetch('/predict_winner', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ year: year, event: eventRound })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Hide the loading GIF
-                document.getElementById('loading').style.display = 'none';
-                console.log("Predicted Winners Data:", data);
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                const tableBody = predictionTable.querySelector('tbody');
+                tableBody.innerHTML = ''; // Clear previous results
                 
-                if (data.predicted_winners) {  // Note the use of 'predicted_winners'
-                    document.getElementById('predictionResult').innerHTML = `<h2>Predicted Winners: ${data.predicted_winners.join(', ')}</h2>`;
-                } else {
-                    document.getElementById('predictionResult').innerHTML = `<h2>Error: ${data.error}</h2>`;
-                }
-            })
-            .catch(error => {
-                // Hide the loading GIF
-                document.getElementById('loading').style.display = 'none';
-                console.error('Error fetching prediction:', error);
-            });
+                data.predicted_winners.forEach((winner, index) => {
+                    const row = tableBody.insertRow();
+                    const positionCell = row.insertCell(0);
+                    const driverCell = row.insertCell(1);
+                    const probabilityCell = row.insertCell(2);
+                    
+                    positionCell.textContent = index + 1;
+                    driverCell.textContent = winner.driver;
+                    probabilityCell.textContent = (winner.probability * 100).toFixed(2) + '%';
+                });
+                
+                // Show the table
+                predictionTable.style.display = 'table';
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('An error occurred while fetching the prediction.');
+            loadingIndicator.style.display = 'none';
         });
-    }
+    });
 });

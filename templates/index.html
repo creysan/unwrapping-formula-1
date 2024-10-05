@@ -9,18 +9,71 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}" id="dark-mode-css">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!-- Icons -->
     <script src="https://kit.fontawesome.com/31149d48b0.js" crossorigin="anonymous"></script>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;1,100;1,300;1,400;1,700&family=Open+Sans:wght@300&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Animate on Scroll Library -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 </head>
+
+<style type="text/css">
+	.autohide{
+		position: fixed;
+	    top: 0;
+	    right: 0;
+	    left: 0;
+	    width: 100%;
+	    z-index: 1030;
+	}
+	.scrolled-down{
+		transform:translateY(-100%); transition: all 0.3s ease-in-out;
+	}
+	.scrolled-up{
+		transform:translateY(0); transition: all 0.3s ease-in-out;
+	}
+
+</style>
+
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded", function() {
+		el_autohide = document.querySelector('.autohide');
+
+		if (el_autohide){
+			var last_scroll_top = 0;
+			window.addEventListener('scroll', function() {
+	       		let scroll_top = window.scrollY;
+		       if (scroll_top < last_scroll_top) {
+		            el_autohide.classList.remove('scrolled-down');
+		            el_autohide.classList.add('scrolled-up');
+		        }
+		        else {
+		            el_autohide.classList.remove('scrolled-up');
+		            el_autohide.classList.add('scrolled-down');
+		        }
+		        last_scroll_top = scroll_top;
+            });
+        }	
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 1000, // Animation duration in milliseconds
+            once: true, // Whether animation should happen only once or every time you scroll
+            offset: 100, // Offset (in px) from the original trigger point
+            delay: 100, // Delay before the animation starts
+        });
+    });
+</script>
+
 <body>
     <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-dark navbarScroll">
+    <nav class="autohide navbar navbar-expand-lg fixed-top navbar-dark navbarScroll">
         <div class="container">
             <a class="navbar-brand active" href="{{ url_for('index')}}">Unwrapping Formula 1</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,14 +85,14 @@
                         <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
+                        <a class="nav-link" href="{{ url_for('unwrap') }}">Unwrap</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('news') }}">News</a>
-                    </li>
-                    <li class="nav-item">
+                    </li> -->
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('learn') }}">Learn</a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
                     </li>
@@ -56,127 +109,108 @@
         </div>
     </nav>
 
-    <div class="container mt-5 pt-5">
-        <!-- Introduction Section -->
-        <section class="text-center">
+    <!-- Introduction Section -->
+    <section class="hero-section">
+        <div class="hero-content text-center">
             <h1>Welcome to Unwrapping Formula 1</h1>
             <p class="lead">
-                Dive into the world of Formula 1 with the latest news, 
-                detailed race calendar, insightful analysis, and much more. Whether 
-                you are a seasoned fan or new to the sport, we have something for you.
+                Dive into the world of Formula 1 with insightful insights, a detailed
+                race calendar, and a predictive race model. 
             </p>
-        </section>
+        </div>
+        <a href="#features" class="scroll-arrow">
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
 
+    <div class="container-fluid">
         <!-- Features Section -->
-        <section class="row text-center">
-            <div class="col-md-4 mb-4">
+        <section class="row text-center mt-5 mx-5 px-5 my-5 py-5" id="features" data-aos="fade-up" data-aos-duration="5000">
+            <h2 class="features-heading mb-5">Key Features</h2>
+            <div class="col-md-6 mb-4 px-2">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                        <i class="fas fa-calendar-alt fa-4x mb-4"></i>
                         <h5 class="card-title">Race Calendar</h5>
                         <p class="card-text">Stay updated with the latest race schedule and never miss a moment of the action.</p>
                         <a href="{{ url_for('calendar') }}" class="btn btn-outline-primary">View Calendar</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
+            <div class="col-md-6 mb-4 px-2">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-search fa-3x mb-3"></i>
-                        <h5 class="card-title">Explore</h5>
-                        <p class="card-text">Explore the world of Formula 1, from team histories to circuit details and more.</p>
-                        <a href="{{ url_for('explore') }}" class="btn btn-outline-primary">Start Exploring</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="fas fa-newspaper fa-3x mb-3"></i>
-                        <h5 class="card-title">Latest News</h5>
-                        <p class="card-text">Get the latest news and updates from the world of Formula 1.</p>
-                        <a href="{{ url_for('news') }}" class="btn btn-outline-primary">Read News</a>
+                        <i class="fas fa-database fa-4x mb-4"></i>
+                        <h5 class="card-title">Unwrap</h5>
+                        <p class="card-text">Unwrap the world of Formula 1. Pick a race and driver, and see the telemetry data.</p>
+                        <a href="{{ url_for('unwrap') }}" class="btn btn-outline-primary">Start Unwrapping</a>
                     </div>
                 </div>
             </div>
         </section>
+    
 
-        <!-- Call-to-Action Section -->
-        <section class="text-center my-5">
-            <h2>Predict the Race Winner</h2>
-            <p class="lead">Use our prediction tool to forecast the winner of any upcoming race. Choose a year and event to get started.</p>
+        <!-- Prediction Model -->
+        <section class="text-center mx-5 px-5" data-aos="fade-up" data-aos-duration="5000">
+            <h2>Become the Ultimate Race Predictor!</h2>
+            <p class="lead mx-5 px-5">
+                This innovative prediction model allows you to accurately forecast the winner of any upcoming race. 
+                Simply select a year and event from the dropdown menu, and watch as the top five contenders for victory are revealed.
+                For details about how the model works, please visit the <a href="{{ url_for('unwrap') }}" style="color: var(--accent-color); text-decoration: underline;">unwrap</a> page.
+
+            </p>
             <div class="form-container">
                 <form id="predictionForm" class="row">
                     <div class="col">
-                        <label for="year" class="form-label">Year:</label>
+                        <label for="year" class="form-label">Select Your Year:</label>
                         <select id="year" name="year" class="form-select" required>
                             <!-- Options will be dynamically added here -->
                         </select>
                     </div>
                     <div class="col">
-                        <label for="event" class="form-label">Event:</label>
+                        <label for="event" class="form-label">Choose the Race:</label>
                         <select id="event" name="event" class="form-select" required>
                             <!-- Options will be dynamically added here -->
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Predict Winner</button>
+                    <button type="submit" class="btn btn-primary">Predict!</button>
                 </form>
             </div>
+
             <div id="predictionResult" class="mt-4">
                 <!-- Prediction result will be displayed here -->
+                <table id="predictionTable" class="table table-hover" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Position</th>
+                            <th scope="col">Driver</th>
+                            <th scope="col">Win Probability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically added here -->
+                    </tbody>
+                </table>
             </div>
             <!-- Loading logo -->
             <div id="loading" style="display:none;">
                 <img src="{{ url_for('static', filename='images/speedfest-automovilismo.gif') }}" alt="Loading..." class="mx-auto d-block">
             </div>
         </section>
-
-        <!-- Testimonials Section -->
-        <section class="text-center my-5">
-            <h2>What Our Users Say</h2>
-            <div class="row text-center d-flex align-items-stretch">
-                <div class="col-md-4 mb-4">
-                    <blockquote class="blockquote card h-100">
-                        <div class="card-body">
-                            <p>"This website is a fantastic resource for any Formula 1 fan. The race predictions are spot on!"</p>
-                            <footer class="blockquote-footer">John Doe</footer>
-                        </div>
-                    </blockquote>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <blockquote class="blockquote card h-100">
-                        <div class="card-body">
-                            <p>"I love the detailed race calendar and the in-depth analysis provided here."</p>
-                            <footer class="blockquote-footer">Jane Smith</footer>
-                        </div>
-                    </blockquote>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <blockquote class="blockquote card h-100">
-                        <div class="card-body">
-                            <p>"Unwrapping Formula 1 has become my go-to site for all F1 news and updates."</p>
-                            <footer class="blockquote-footer">Emily Johnson</footer>
-                        </div>
-                    </blockquote>
-                </div>
-            </div>
-        </section>
-        
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
+    <footer class="py-4">
         <div class="container text-center">
             <p>&copy; 2024 Unwrapping Formula 1. All rights reserved.</p>
             <p>
-                <a href="#" class="text-white mx-2"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/creysan/unwrapping-formula-1" target="_blank" class="text-white mx-2"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/christianreyessantos/" target="_blank" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
             </p>
             <p>
                 <a href="#" class="text-white mx-2">Privacy Policy</a> |
-                <a href="#" class="text-white mx-2">Terms of Service</a>
+                <a href="#" class="text-white mx-2">Terms of Service</a> |
+                <a href="https://christianreyes.dev/" target="_blank" class="text-white mx-2">Personal Website</a>
             </p>
         </div>
     </footer>
